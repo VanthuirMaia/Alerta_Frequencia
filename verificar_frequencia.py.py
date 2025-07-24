@@ -28,16 +28,37 @@ padrao = re.compile(
     r'\d+\s+\d{4}\.\d+\.\d+\s+([A-ZÁÂÉÍÓÚÇÑ ]+)\s+Em Processo\s+\d+\s+\d+\s+(\d+)'
 )
 
-print("\n📢 Alunos com mais de 25% de faltas:")
-encontrou_alertas = False
+# Flags de controle
+tem_alerta_critico = False
+tem_alerta_atencao = False
 
-# Verifica alunos acima do limite
+# Listas para exibir depois
+alertas_critico = []
+alertas_atencao = []
+
+# Verifica os alunos
 for match in padrao.finditer(texto):
     nome = match.group(1).strip()
     falta_percentual = int(match.group(2))
-    if falta_percentual > 25:
-        print(f"⚠️  {nome} está com {falta_percentual}% de faltas!")
-        encontrou_alertas = True
 
-if not encontrou_alertas:
-    print("✅ Nenhum aluno com mais de 25% de faltas.")
+    if falta_percentual > 25:
+        alertas_critico.append((nome, falta_percentual))
+        tem_alerta_critico = True
+    elif 20 <= falta_percentual <= 25:
+        alertas_atencao.append((nome, falta_percentual))
+        tem_alerta_atencao = True
+
+# Exibição final
+print("\n🔴 ALERTA CRÍTICO (faltas acima de 25%):")
+if tem_alerta_critico:
+    for nome, perc in alertas_critico:
+        print(f"❌ {nome} está com {perc}% de faltas!")
+else:
+    print("✅ Nenhum aluno acima de 25% de faltas.")
+
+print("\n🟠 ALERTA DE ATENÇÃO (entre 20% e 25%):")
+if tem_alerta_atencao:
+    for nome, perc in alertas_atencao:
+        print(f"⚠️  {nome} está com {perc}% de faltas.")
+else:
+    print("✅ Nenhum aluno entre 20% e 25% de faltas.")
